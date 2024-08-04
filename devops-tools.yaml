@@ -5,30 +5,18 @@ metadata:
   labels:
     app: devops-tools
 spec:
-  volumes:
-    - name: tools-storage
-      emptyDir: {}
-  initContainers:
-    - name: install-tools
+  containers:
+    - name: devops-tools-container
       image: ubuntu:20.04
       command:
         - sh
         - -c
         - |
           apt-get update && \
-          apt-get install -y git vim curl && \
-          apt-get clean
-      volumeMounts:
-        - name: tools-storage
-          mountPath: /opt/tools
-  containers:
-    - name: devops-tools-container
-      image: ubuntu:20.04
-      command: [ "sleep", "infinity" ]
-      volumeMounts:
-        - name: tools-storage
-          mountPath: /opt/tools
+          apt-get install -y git vim curl zsh && \
+          apt-get clean && \
+          sleep infinity
       env:
         - name: PATH
-          value: "/opt/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   restartPolicy: Always
