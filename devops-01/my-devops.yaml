@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: devops-tools-pod
+  labels:
+    app: devops-tools
+spec:
+  containers:
+    - name: devops-tools-container
+      image: ubuntu:20.04
+      command:
+        - sh
+        - -c
+        - |
+          apt-get update && \
+          apt-get install -y git vim curl zsh && \
+          apt-get clean && \
+          sleep infinity
+      env:
+        - name: PATH
+          value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  restartPolicy: Always
