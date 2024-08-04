@@ -16,7 +16,7 @@ spec:
         - -c
         - |
           apt-get update && \
-          apt-get install -y git vim curl zsh && \
+          apt-get install -y git vim curl && \
           apt-get clean
       volumeMounts:
         - name: tools-storage
