@@ -17,10 +17,7 @@ spec:
         - |
           apt-get update && \
           apt-get install -y git vim curl zsh && \
-          sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended && \
-          cp -r /root/.oh-my-zsh /opt/tools/oh-my-zsh && \
-          cp /root/.zshrc /opt/tools/.zshrc && \
-          sed -i 's/\/root/\/opt\/tools/g' /opt/tools/.zshrc
+          apt-get clean
       volumeMounts:
         - name: tools-storage
           mountPath: /opt/tools
@@ -34,13 +31,4 @@ spec:
       env:
         - name: PATH
           value: "/opt/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-        - name: ZSH
-          value: "/opt/tools/oh-my-zsh"
-        - name: ZSH_CUSTOM
-          value: "/opt/tools/oh-my-zsh/custom"
-        - name: SHELL
-          value: "/bin/zsh"
-        - name: HOME
-          value: "/opt/tools"
-      workingDir: /opt/tools
   restartPolicy: Always
