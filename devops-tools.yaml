@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: devops-tools-pod
+  labels:
+    app: devops-tools
+spec:
+  volumes:
+    - name: tools-storage
+      emptyDir: {}
+  initContainers:
+    - name: install-tools
+      image: ubuntu:20.04
+      command:
+        - sh
+        - -c
+        - |
+          apt-get update && apt-get install -y \
+            curl \
+            wget \
+            git \
+            vim \
+            htop \
+            python3 \
+            python3-pip \
+            openjdk-11-jdk \
+            maven \
+            nodejs \
+            npm \
+            docker.io \
+            kubectl \
+            helm \
+            terraform \
+            ansible \
+            jq \
+            zsh \
+            && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+            && unzip awscliv2.zip \
+            && ./aws/install \
+            && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
+            && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+            && apt-get install apt-transport-https ca-certificates -y \
+            && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
+            && apt-get update && apt-get install google-cloud-sdk -y \
+            && git clone https://github.com/ahmetb/kubectx /opt/tools/kubectx \
+            && ln -s /opt/tools/kubectx/kubectx /usr/local/bin/kubectx \
+            && ln -s /opt/tools/kubectx/kubens /usr/local/bin/kubens \
+            && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
+            && cp -r /root/.oh-my-zsh /opt/tools/oh-my-zsh \
+            && cp /root/.zshrc /opt/tools/.zshrc \
+            && sed -i 's/\/root/\/opt\/tools/g' /opt/tools/.zshrc
+      volumeMounts:
+        - name: tools-storage
+          mountPath: /opt/tools
+  containers:
+    - name: devops-tools-container
+      image: ubuntu:20.04
+      command: [ "sleep", "infinity" ]
+      volumeMounts:
+        - name: tools-storage
+          mountPath: /opt/tools
+      env:
+        - name: PATH
+          value: "/opt/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        - name: ZSH
+          value: "/opt/tools/oh-my-zsh"
+        - name: ZSH_CUSTOM
+          value: "/opt/tools/oh-my-zsh/custom"
+        - name: SHELL
+          value: "/bin/zsh"
+        - name: HOME
+          value: "/opt/tools"
+      workingDir: /opt/tools
+  restartPolicy: Always
